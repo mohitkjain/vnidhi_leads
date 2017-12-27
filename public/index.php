@@ -29,6 +29,11 @@ require_once '../api/admin/get_target_details.php';
 require_once '../api/admin/add_fd_reward_cron_job.php';
 require_once '../api/admin/edit_user_details.php';
 require_once '../api/admin/get_leads_stats.php';
+require_once '../api/admin/get_total_employee_team.php';
+require_once '../api/admin/get_total_leads_details.php';
+require_once '../api/admin/get_active_leads_details.php';
+require_once '../api/admin/get_accepted_leads_details.php';
+require_once '../api/admin/get_declined_leads_details.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';
