@@ -12,7 +12,7 @@ $app->get('/api/admin/leads_stats', function ($request, $response)
         $stmt = $con->prepare($sql);
         if ($stmt->execute()) 
         {
-            $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if($data) 
             {
