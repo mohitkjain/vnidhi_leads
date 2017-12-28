@@ -25,6 +25,7 @@ $app->post('/api/admin/users/user_edit', function ($request, $response)
         {
             $con = connect_db();
             $result;
+            $login = base64_encode($login);
             //Prepare a Query Statement
             $sql_update = "UPDATE `vn_users` SET `fname`= :fname,`lname`= :lname,`loginid`= :loginid,`usertype`= :usertype,`empid`= :empid,`position`= :position,`tl_id`= :tl_id WHERE `user_id` =  :user_id";
             $stmt = $con->prepare($sql_update);

@@ -6,6 +6,7 @@ class UserInfo
     public $fname = null;
     public $lname = null;
     public $usertype = null;
+    public $loginid = null;
     public $empid = null;
     public $position = null;
     public $tl_id = null;
@@ -30,7 +31,7 @@ $app->get('/api/users/info/{user_id}', function ($request, $response)
              $con = connect_db();
 
             //Prepare a Query Statement
-            $sql = "SELECT userdetail.`user_id`, userdetail.`fname`, userdetail.`lname`, userdetail.`usertype`, userdetail.`empid`, userdetail.`position`, userdetail.`tl_id`, CONCAT(teamleader.fname, ' ', teamleader.lname) AS 'tl_name', userinfo.email_id, userinfo.mobile, userinfo.dob FROM `vn_users` AS userdetail LEFT OUTER JOIN vn_userinfo AS userinfo ON userdetail.`user_id` = userinfo.user_id LEFT OUTER JOIN vn_users AS teamleader ON userdetail.`tl_id` = teamleader.user_id WHERE userdetail.`user_id` = :user_id";
+            $sql = "SELECT userdetail.`user_id`, userdetail.`fname`, userdetail.`lname`, userdetail.`usertype`, FROM_BASE64(userdetail.`loginid`) AS 'loginid', userdetail.`empid`, userdetail.`position`, userdetail.`tl_id`, CONCAT(teamleader.fname, ' ', teamleader.lname) AS 'tl_name', userinfo.email_id, userinfo.mobile, userinfo.dob FROM `vn_users` AS userdetail LEFT OUTER JOIN vn_userinfo AS userinfo ON userdetail.`user_id` = userinfo.user_id LEFT OUTER JOIN vn_users AS teamleader ON userdetail.`tl_id` = teamleader.user_id WHERE userdetail.`user_id` = :user_id";
             
             $stmt = $con->prepare($sql);
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -44,6 +45,7 @@ $app->get('/api/users/info/{user_id}', function ($request, $response)
                 $user_info->fname = $user_data['fname'];
                 $user_info->lname = $user_data['lname'];
                 $user_info->usertype = $user_data['usertype'];
+                $user_info->loginid = $user_data['loginid'];
                 $user_info->empid = $user_data['empid'];
                 $user_info->position = $user_data['position'];
                 $user_info->tl_id = $user_data['tl_id'];

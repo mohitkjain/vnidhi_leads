@@ -26,6 +26,9 @@ $app->post('/api/users/user_add', function ($request, $response)
         {
             $con = connect_db();
             
+            $login = base64_encode($login);
+            $pass = base64_encode($pass);
+
             //Prepare a Query Statement
             $stmt = $con->prepare("INSERT INTO `vn_users` (`fname`, `lname`, `loginid`, `password`, `usertype`, `empid`, `position`, `tl_id`) VALUES (:fname, :lname, :loginid, :password, :usertype, :empid, :position, :tl_id)");
             $stmt->bindParam(':fname', $fname, PDO::PARAM_STR);
