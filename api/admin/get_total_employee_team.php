@@ -8,7 +8,7 @@ $app->get('/api/admin/employee_teams_stats', function ($request, $response)
         $con = connect_db();
 
         //Prepare a Query Statement
-        $sql = "SELECT COUNT(*) AS 'total_employees', (SELECT COUNT(*) FROM `vn_users` WHERE `usertype` = 'Teamleader') AS 'total_teams' FROM `vn_users` WHERE `usertype` != 'Admin'";
+        $sql = "SELECT COUNT(*) AS 'total_employees', (SELECT COUNT(*) FROM `vn_users` WHERE `usertype` = 'Teamleader' AND `active` = 1) AS 'total_teams' FROM `vn_users` WHERE `usertype` != 'Admin' AND `active` = 1";
         $stmt = $con->prepare($sql);
         if ($stmt->execute()) 
         {

@@ -4,13 +4,14 @@ $app->get('/api/admin/get_targets', function ($request, $response)
 {
     require_once '../api/settings/dbconnect.php';
     require_once '../api/settings/config.php';
+    setlocale(LC_MONETARY, 'en_IN');
     try
     {
         $config = new config();
         $result = array();
         $con = connect_db();
 
-        $sql = "SELECT `user_id`, CONCAT(`fname`, ' ', `lname`) AS 'user_name', `usertype` FROM `vn_users` WHERE (`usertype` = 'Salaried' OR `usertype` = 'Teamleader') AND `active` = 1";
+        $sql = "SELECT `user_id`, CONCAT(`fname`, ' ', `lname`) AS 'user_name', `usertype`, `position` FROM `vn_users` WHERE (`usertype` = 'Salaried' OR `usertype` = 'Teamleader') AND `active` = 1";
 
         $stmt = $con->prepare($sql);
 
@@ -63,14 +64,15 @@ $app->get('/api/admin/get_targets', function ($request, $response)
 
                         $result["$user_id"]['user_name'] = $user['user_name'];
                         $result["$user_id"]['usertype'] = $user['usertype'];
+                        $result["$user_id"]['position'] = $user['position'];
                         $result["$user_id"]['current_month'] = $current_data->current_month;
                         $result["$user_id"]['current_year'] = $current_data->current_year;
-                        $result["$user_id"]['current_month_target'] = $current_data->current_month_target;
-                        $result["$user_id"]['current_month_achieved'] = $current_data->current_month_achieved;
+                        $result["$user_id"]['current_month_target'] = money_format('%!i', $current_data->current_month_target);
+                        $result["$user_id"]['current_month_achieved'] = money_format('%!i',$current_data->current_month_achieved);
                         $result["$user_id"]['pre_month'] = $pre_data->pre_month;
                         $result["$user_id"]['pre_year'] = $pre_data->pre_year;
-                        $result["$user_id"]['pre_month_target'] = $pre_data->pre_month_target;
-                        $result["$user_id"]['pre_month_achieved'] = $pre_data->pre_month_achieved;
+                        $result["$user_id"]['pre_month_target'] = money_format('%!i',$pre_data->pre_month_target);
+                        $result["$user_id"]['pre_month_achieved'] = money_format('%!i',$pre_data->pre_month_achieved);
                     }
                 }                
             }
