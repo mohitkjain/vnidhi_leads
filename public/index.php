@@ -34,6 +34,7 @@ require_once '../api/admin/get_total_leads_details.php';
 require_once '../api/admin/get_active_leads_details.php';
 require_once '../api/admin/get_accepted_leads_details.php';
 require_once '../api/admin/get_declined_leads_details.php';
+require_once '../api/admin/reset_password.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';
