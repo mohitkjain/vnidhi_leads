@@ -1,16 +1,16 @@
 <?php
 
-$app->post('/api/admin/deactivate-user', function ($request, $response) 
+$app->post('/api/admin/deactivate_user', function ($request, $response) 
 {
     require_once '../api/settings/dbconnect.php';
 
     $parsedBody = $request->getParsedBody();
     $user_id = $parsedBody['user_id'];
-    $active = $parsedBody['active'];
+    //$active = $parsedBody['active'];
     $usertype = $parsedBody['usertype'];
     $tl_id = $parsedBody['tl_id'];
 
-    if(isset($user_id) && isset($active) && isset($usertype) && isset($tl_id))
+    if(isset($user_id) && isset($usertype) && isset($tl_id))
     {
         try
         {
@@ -29,7 +29,7 @@ $app->post('/api/admin/deactivate-user', function ($request, $response)
 
                 if ($stmt->execute()) 
                 {
-                    $sql = "UPDATE `vn_users` SET `active`= :active WHERE `user_id` = :user_id";
+                   $sql = "UPDATE `vn_users` SET `active`= :active WHERE `user_id` = :user_id";
                 }
                 else
                 {
@@ -41,7 +41,7 @@ $app->post('/api/admin/deactivate-user', function ($request, $response)
                 $sql = "UPDATE `vn_users` SET `active`= :active WHERE `user_id` = :user_id";
             } 
             $stmt = $con->prepare($sql);
-
+            $active = 0;
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
             $stmt->bindParam(':active', $active, PDO::PARAM_INT);
 
