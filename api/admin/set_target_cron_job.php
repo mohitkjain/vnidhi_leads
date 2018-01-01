@@ -14,7 +14,7 @@ $app->get('/api/cron/set_target/current_month', function ($request, $response)
         $current_year = date('Y');
         $result = array();
     
-        $sql = "SELECT `user_id`, `usertype` FROM `vn_users` WHERE (`usertype` = 'Salaried' OR `usertype` = 'Teamleader') AND `active` = 1";
+        $sql = "SELECT `user_id`, `fname`, `lname`, `usertype` FROM `vn_users` WHERE (`usertype` = 'Salaried' OR `usertype` = 'Teamleader') AND `active` = 1";
         $stmt = $con->prepare($sql);
     
         if($stmt->execute())
@@ -24,7 +24,9 @@ $app->get('/api/cron/set_target/current_month', function ($request, $response)
             foreach($user_data as $user)
             {
                 $user_id = $user['user_id'];
-    
+                $fname = $user['fname'];
+                $lname = $user['lname'];
+                $usertype = $user['usertype'];
                 //Check is there current month target exist or not
                 $cur_sql = "SELECT `target_amount` FROM `vn_target_fd` WHERE `user_id` = :user_id AND `target_year` = :current_year AND `target_month` = :current_month";
     
@@ -74,10 +76,18 @@ $app->get('/api/cron/set_target/current_month', function ($request, $response)
                                 if($id >= 1)
                                 {
                                     $result[$user_id]['result'] = "success";
+                                    $result[$user_id]['name'] = $fname. " " . $lname;
+                                    $result[$user_id]['usertype'] = $usertype;
+                                    $result[$user_id]['target'] = $target_amount;
+                                    $result[$user_id]['month_year'] = date('F'). ", ".$current_year ;
                                 }
                                 else
                                 {
                                     $result[$user_id]['result'] = "failure";
+                                    $result[$user_id]['name'] = $fname. " " . $lname;
+                                    $result[$user_id]['usertype'] = $usertype;
+                                    $result[$user_id]['target'] = $target_amount;
+                                    $result[$user_id]['month_year'] = date('F'). ", ".$current_year ;
                                 }
                             }
                             else
