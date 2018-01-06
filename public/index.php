@@ -35,6 +35,9 @@ require_once '../api/admin/get_active_leads_details.php';
 require_once '../api/admin/get_accepted_leads_details.php';
 require_once '../api/admin/get_declined_leads_details.php';
 require_once '../api/admin/reset_password.php';
+require_once '../api/admin/get_current_incentives_usertype.php';
+require_once '../api/admin/get_unpaid_incentives_usertype.php';
+require_once '../api/admin/get_incentive_details_user_id.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';

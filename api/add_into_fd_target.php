@@ -18,7 +18,7 @@ $app->post('/api/users/fd/achieved', function ($request, $response)
 
             $con->beginTransaction();
 
-            $sql = "SELECT `achieved` FROM `vn_target_fd_achieved` WHERE `user_id` = :user_id AND `target_month` = :current_month AND `target_year` = :current_year";
+            $sql = "SELECT `achieved` FROM `vn_target_fd` WHERE `user_id` = :user_id AND `target_month` = :current_month AND `target_year` = :current_year";
             
             $stmt = $con->prepare($sql);
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -31,13 +31,10 @@ $app->post('/api/users/fd/achieved', function ($request, $response)
                 if($count == 1)
                 {
                     $data = $stmt->fetch();
-                    $amount += $data['achieved'];
+                    if(!empty($data))
+                        $amount += $data['achieved'];
 
-                    $sql = "UPDATE `vn_target_fd_achieved` SET `achieved` = :amount WHERE `user_id` = :user_id AND `target_month` = :current_month AND `target_year` = :current_year";
-                }
-                else
-                {
-                    $sql = "INSERT INTO `vn_target_fd_achieved`(`user_id`, `target_month`, `target_year`, `achieved`) VALUES (:user_id, :current_month, :current_year, :amount)";
+                    $sql = "UPDATE `vn_target_fd` SET `achieved` = :amount WHERE `user_id` = :user_id AND `target_month` = :current_month AND `target_year` = :current_year";
                 }
 
                 $stmt = $con->prepare($sql);

@@ -40,8 +40,9 @@ $app->post('/api/telecaller/incentive', function ($request, $response)
 
                     $multiple_count = floor($amount / $multiple_value);
                     $telecaller_incentive =  $incentive_rupee * $multiple_count;
+                    $incentive_status = 'incentive_unpaid';
 
-                    $sql = "INSERT INTO `vn_incentive_earn_telecaller`(`lead_id`, `scheme_type`, `date`, `telecaller_id`, `telecaller_incentive`) VALUES (:lead_id, :scheme_type, :date, :telecaller_id, :telecaller_incentive)";
+                    $sql = "INSERT INTO `vn_incentive_earn_telecaller`(`lead_id`, `scheme_type`, `date`, `telecaller_id`, `telecaller_incentive`, `telecaller_incentive_status`) VALUES (:lead_id, :scheme_type, :date, :telecaller_id, :telecaller_incentive, :incentive_status)";
 
                     $stmt = $con->prepare($sql);
                     $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -49,6 +50,7 @@ $app->post('/api/telecaller/incentive', function ($request, $response)
                     $stmt->bindParam(':date', $date);
                     $stmt->bindParam(':telecaller_id', $creator_id, PDO::PARAM_INT);
                     $stmt->bindParam(':telecaller_incentive', $telecaller_incentive);
+                    $stmt->bindParam(':incentive_status', $incentive_status);
 
                     if ($stmt->execute()) 
                     {

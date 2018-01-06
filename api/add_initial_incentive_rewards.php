@@ -25,6 +25,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
             if ($stmt->execute()) 
             {
                 $lead_data = $stmt->fetch();
+                $incentive_status = 'incentive_unpaid';
                 if($lead_data['scheme_type'] === "FD")
                 {
                     //We start our transaction.                    
@@ -38,22 +39,25 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                         $fd_target_month=date("m",strtotime($fd_target_date));
                         $fd_target_year=date("Y",strtotime($fd_target_date));
 
-                        $ch = curl_init();
-                        $url = $config->addFD_Achieved();
-                        $post_data = "user_id=".$lead_data['user_id']."&current_month=".$fd_target_month."&current_year=".$fd_target_year."&amount=".$lead_data['amount'];
-                        
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                        curl_setopt($ch, CURLOPT_POSTFIELDS,$post_data);
-                        curl_setopt($ch, CURLOPT_URL, $url);
-                        curl_setopt($ch, CURLOPT_HEADER, 0);// No header in the result
-                        
-                        // Fetch and return content, save it.
-                        $output_data= curl_exec($ch);
-                        curl_close($ch);
+                        if($lead_data['usertype'] === "Teamleader" || $lead_data['usertype'] === "Salaried") 
+                        {
+                            $ch = curl_init();
+                            $url = $config->addFD_Achieved();
+                            $post_data = "user_id=".$lead_data['user_id']."&current_month=".$fd_target_month."&current_year=".$fd_target_year."&amount=".$lead_data['amount'];
+                            
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_VERBOSE, 1);
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                            curl_setopt($ch, CURLOPT_POSTFIELDS,$post_data);
+                            curl_setopt($ch, CURLOPT_URL, $url);
+                            curl_setopt($ch, CURLOPT_HEADER, 0);// No header in the result
+                            
+                            // Fetch and return content, save it.
+                            $output_data= curl_exec($ch);
+                            curl_close($ch);
+                        }
 
                         $row_fd_reward_count = 1;
                         $year = 1;
@@ -154,7 +158,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $tl_incentive = (($lead_data['amount'] * $percents[$users[1]][$duration_month]) / 100);
                                     $head_incentive = (($lead_data['amount'] * $percents[$users[2]][$duration_month]) / 100);
 
-                                    $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `user_id`, `user_reward`, `user_incentive`, `tl_id`, `tl_reward`, `tl_incentive`, `head_id`, `head_reward`, `head_incentive`) VALUES (:lead_id, :date, 'paid', :user_id, :user_reward, :user_incentive, :tl_id, :tl_reward, :tl_incentive, :head_id,:head_reward, :head_incentive)";
+                                    $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `user_id`, `user_reward`, `user_incentive`, `user_incentive_status`, `tl_id`, `tl_reward`, `tl_incentive`, `tl_incentive_status`, `head_id`, `head_reward`, `head_incentive`, `head_incentive_status`) VALUES (:lead_id, :date, 'paid', :user_id, :user_reward, :user_incentive, :incentive_status, :tl_id, :tl_reward, :tl_incentive, :incentive_status, :head_id,:head_reward, :head_incentive, :incentive_status)";
 
                                     $stmt = $con->prepare($sql);
                                     $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -168,6 +172,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $stmt->bindParam(':head_id', $lead_data['head_id'], PDO::PARAM_INT);
                                     $stmt->bindParam(':head_reward', $head_reward, PDO::PARAM_INT);
                                     $stmt->bindParam(':head_incentive', $head_incentive);
+                                    $stmt->bindParam(':incentive_status', $incentive_status);
                                 }
                                 else
                                 {
@@ -180,7 +185,8 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $stmt = $con->prepare($sql);
                                     $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
                                     $stmt->bindParam(':date', $date);
-                                    $stmt->bindParam(':user_id', $lead_data['user_id'], PDO::PARAM_INT);         $stmt->bindParam(':tl_id', $lead_data['tl_id'], PDO::PARAM_INT);
+                                    $stmt->bindParam(':user_id', $lead_data['user_id'], PDO::PARAM_INT);         
+                                    $stmt->bindParam(':tl_id', $lead_data['tl_id'], PDO::PARAM_INT);
                                     $stmt->bindParam(':head_id', $lead_data['head_id'], PDO::PARAM_INT);       
                                 }                                
                                 
@@ -281,7 +287,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
 
                                         $tl_incentive = (($lead_data['amount'] * $percents[$users[1]][$duration_month]) / 100);
     
-                                        $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `tl_id`, `tl_reward`, `tl_incentive`) VALUES (:lead_id, :date, 'paid', :tl_id, :tl_reward, :tl_incentive)";
+                                        $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `tl_id`, `tl_reward`, `tl_incentive`, `tl_incentive_status`) VALUES (:lead_id, :date, 'paid', :tl_id, :tl_reward, :tl_incentive, :incentive_status)";
     
                                         $stmt = $con->prepare($sql);
                                         $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -289,6 +295,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $stmt->bindParam(':tl_id', $lead_data['user_id'], PDO::PARAM_INT);
                                         $stmt->bindParam(':tl_reward', $tl_reward, PDO::PARAM_INT);
                                         $stmt->bindParam(':tl_incentive', $tl_incentive);
+                                        $stmt->bindParam(':incentive_status', $incentive_status);
                                     }
                                     else
                                     {
@@ -324,7 +331,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $head_reward = (($lead_data['amount'] * $rewards[$users[2]][1]) / 100);
                                         $head_incentive = (($lead_data['amount'] * $percents[$users[2]][$duration_month]) / 100);
     
-                                        $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `head_id`, `head_reward`, `head_incentive`) VALUES (:lead_id, :date, 'paid', :head_id, :head_reward, :head_incentive)";
+                                        $sql = "INSERT INTO `vn_fd_reward`(`lead_id`, `date`, `reward_paid`, `head_id`, `head_reward`, `head_incentive`, `head_incentive_status`) VALUES (:lead_id, :date, 'paid', :head_id, :head_reward, :head_incentive, :incentive_status)";
     
                                         $stmt = $con->prepare($sql);
                                         $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -332,6 +339,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $stmt->bindParam(':head_id', $lead_data['user_id'], PDO::PARAM_INT);
                                         $stmt->bindParam(':head_reward', $head_reward, PDO::PARAM_INT);
                                         $stmt->bindParam(':head_incentive', $head_incentive);
+                                        $stmt->bindParam(':incentive_status', $incentive_status);
                                     }
                                     else
                                     {
@@ -466,7 +474,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $tl_incentive = (($lead_data['amount'] * $percents[$users[1]][1]) / 100);
                                     $head_incentive = (($lead_data['amount'] * $percents[$users[2]][1]) / 100);
 
-                                    $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `user_id`, `user_reward`, `user_incentive`, `tl_id`, `tl_reward`, `tl_incentive`, `head_id`, `head_reward`, `head_incentive`) VALUES(:lead_id, :installment_no, :date, :payment_status, :user_id, :user_reward, :user_incentive, :tl_id, :tl_reward, :tl_incentive, :head_id, :head_reward, :head_incentive)";
+                                    $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `user_id`, `user_reward`, `user_incentive`, `user_incentive_status`, `tl_id`, `tl_reward`, `tl_incentive`, `tl_incentive_status`, `head_id`, `head_reward`, `head_incentive`, `head_incentive_status`) VALUES(:lead_id, :installment_no, :date, :payment_status, :user_id, :user_reward, :user_incentive, :incentive_status, :tl_id, :tl_reward, :tl_incentive, :incentive_status, :head_id, :head_reward, :head_incentive, :incentive_status)";
 
                                     $stmt = $con->prepare($sql);
                                     $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -482,6 +490,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $stmt->bindParam(':head_id', $lead_data['head_id'], PDO::PARAM_INT);
                                     $stmt->bindParam(':head_reward', $head_reward);
                                     $stmt->bindParam(':head_incentive', $head_incentive);
+                                    $stmt->bindParam(':incentive_status', $incentive_status);
                                 }
                                 else
                                 {
@@ -501,7 +510,8 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                     $stmt->bindParam(':installment_no', $installment_no, PDO::PARAM_INT);
                                     $stmt->bindParam(':date', $date);
                                     $stmt->bindParam(':payment_status', $payment_status);
-                                    $stmt->bindParam(':user_id', $lead_data['user_id'], PDO::PARAM_INT);        $stmt->bindParam(':tl_id', $lead_data['tl_id'], PDO::PARAM_INT);
+                                    $stmt->bindParam(':user_id', $lead_data['user_id'], PDO::PARAM_INT);        
+                                    $stmt->bindParam(':tl_id', $lead_data['tl_id'], PDO::PARAM_INT);
                                     $stmt->bindParam(':head_id', $lead_data['head_id'], PDO::PARAM_INT);       
                                 }                                
                                 
@@ -607,7 +617,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $tl_reward = (($lead_data['amount'] * $rewards[$users[1]][1]) / 100);
                                         $tl_incentive = (($lead_data['amount'] * $percents[$users[1]][1]) / 100);
     
-                                        $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `tl_id`, `tl_reward`, `tl_incentive`) VALUES(:lead_id, :installment_no, :date, :payment_status, :tl_id, :tl_reward, :tl_incentive)";
+                                        $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `tl_id`, `tl_reward`, `tl_incentive`, `tl_incentive_status`) VALUES(:lead_id, :installment_no, :date, :payment_status, :tl_id, :tl_reward, :tl_incentive, :incentive_status)";
 
                                         $stmt = $con->prepare($sql);
                                         $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -617,6 +627,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $stmt->bindParam(':tl_id', $lead_data['user_id'], PDO::PARAM_INT);
                                         $stmt->bindParam(':tl_reward', $tl_reward);
                                         $stmt->bindParam(':tl_incentive', $tl_incentive);
+                                        $stmt->bindParam(':incentive_status', $incentive_status);
                                     }
                                     else
                                     {
@@ -657,7 +668,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $head_reward = (($lead_data['amount'] * $rewards[$users[2]][1]) / 100);
                                         $head_incentive = (($lead_data['amount'] * $percents[$users[2]][1]) / 100);
     
-                                        $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `head_id`, `head_reward`, `head_incentive`) VALUES(:lead_id, :installment_no, :date, :payment_status, :head_id, :head_reward, :head_incentive)";
+                                        $sql = "INSERT INTO `vn_rd_reward_incentive`(`lead_id`, `installment_no`, `date`, `payment_status`, `head_id`, `head_reward`, `head_incentive`, `head_incentive_status`) VALUES(:lead_id, :installment_no, :date, :payment_status, :head_id, :head_reward, :head_incentive, :incentive_status)";
 
                                         $stmt = $con->prepare($sql);
                                         $stmt->bindParam(':lead_id', $lead_id, PDO::PARAM_INT);
@@ -667,6 +678,7 @@ $app->post('/api/incentive-reward/initial', function ($request, $response)
                                         $stmt->bindParam(':head_id', $lead_data['user_id'], PDO::PARAM_INT);
                                         $stmt->bindParam(':head_reward', $head_reward);
                                         $stmt->bindParam(':head_incentive', $head_incentive);
+                                        $stmt->bindParam(':incentive_status', $incentive_status);
                                     }
                                     else
                                     {
