@@ -125,7 +125,8 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                         $head_incentive = (($rd_data['amount'] * $percents[$users[2]][$installment_no_year]) / 100);
 
                         $paid_status = 'paid';
-                        $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status, `user_reward`= :user_reward, `user_incentive`= :user_incentive, `tl_reward`= :tl_reward, `tl_incentive`= :tl_incentive, `head_reward`= :head_reward,`head_incentive`= :head_incentive WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
+                        $incentive_status = 'incentive_unpaid';
+                        $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status, `user_reward`= :user_reward, `user_incentive`= :user_incentive, `user_incentive_status` = :incentive_status, `tl_reward`= :tl_reward, `tl_incentive`= :tl_incentive, `tl_incentive_status` = :incentive_status, `head_reward`= :head_reward,`head_incentive`= :head_incentive, `head_incentive_status` = :incentive_status WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
 
                         //Prepare a Query Statement
                         $stmt = $con->prepare($sql);
@@ -141,6 +142,7 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                         $stmt->bindParam(':head_incentive', $head_incentive);
                         $stmt->bindParam(':unpaid_status', $rd_data['payment_status']);
                         $stmt->bindParam(':last_day_this_month', $last_day_this_month);
+                        $stmt->bindParam(':incentive_status', $incentive_status);
 
                         if($stmt->execute())
                         {
@@ -169,7 +171,8 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                             $tl_incentive = (($rd_data['amount'] * $percents[$users[1]][$installment_no_year]) / 100);
     
                             $paid_status = 'paid';
-                            $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status,  `tl_reward`= :tl_reward, `tl_incentive`= :tl_incentive WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
+                            $incentive_status = 'incentive_unpaid';
+                            $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status,  `tl_reward`= :tl_reward, `tl_incentive`= :tl_incentive, `tl_incentive_status` = :incentive_status WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
     
                             //Prepare a Query Statement
                             $stmt = $con->prepare($sql);
@@ -181,6 +184,7 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                             $stmt->bindParam(':tl_incentive', $tl_incentive);
                             $stmt->bindParam(':unpaid_status', $rd_data['payment_status']);
                             $stmt->bindParam(':last_day_this_month', $last_day_this_month);
+                            $stmt->bindParam(':incentive_status', $incentive_status);
                         }
                         else if($rd_data['usertype'] === "Head")
                         {
@@ -189,7 +193,8 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                             $head_incentive = (($rd_data['amount'] * $percents[$users[2]][$installment_no_year]) / 100);
     
                             $paid_status = 'paid';
-                            $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status,  `head_reward`= :head_reward,`head_incentive`= :head_incentive WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
+                            $incentive_status = 'incentive_unpaid';
+                            $sql = "UPDATE `vn_rd_reward_incentive` SET `payment_status`= :paid_status,  `head_reward`= :head_reward,`head_incentive`= :head_incentive, `head_incentive_status` = :incentive_status WHERE `lead_id` = :lead_id AND `installment_no` = :installment_no AND `payment_status` = :unpaid_status AND date <= :last_day_this_month ";
     
                             //Prepare a Query Statement
                             $stmt = $con->prepare($sql);
@@ -201,6 +206,7 @@ $app->post('/api/admin/rd/installment', function ($request, $response)
                             $stmt->bindParam(':head_incentive', $head_incentive);
                             $stmt->bindParam(':unpaid_status', $rd_data['payment_status']);
                             $stmt->bindParam(':last_day_this_month', $last_day_this_month);
+                            $stmt->bindParam(':incentive_status', $incentive_status);
                         }
                         else
                         {

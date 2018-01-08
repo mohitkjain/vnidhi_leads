@@ -144,19 +144,29 @@ $app->post('/api/admin/incentive_details', function ($request, $response)
                     foreach($fd_data as $fd)
                     {
                         $total_fd_incentive += $fd['incentive'];
-                    } 
-                    $incentive_status = $rd_data[0]['incentive_status'];
+                    }
+                    if(count($rd_data) > 0) 
+                        $incentive_status = $rd_data[0]['incentive_status'];
+                    else
+                        $incentive_status = 'NA';
 
-                    if($usertype === "Teamleader" || $usertype === "Salaried")
+                    if(count($fd_data) > 0)
                     {
-                        $target_amount = $fd_data[0]['target_amount'];
-                        $target_achieved = $fd_data[0]['target_achieved'];
-
-                        if($target_achieved < $target_amount)
+                        if($usertype === "Teamleader" || $usertype === "Salaried")
                         {
-                            $total_fd_incentive = 0;
-                            $array  = array();
-                            $total->incentive['fd_incentive'] = $array;
+                            $target_amount = $fd_data[0]['target_amount'];
+                            $target_achieved = $fd_data[0]['target_achieved'];
+    
+                            if($target_achieved < $target_amount)
+                            {
+                                $total_fd_incentive = 0;
+                                $array  = array();
+                                $total->incentive['fd_incentive'] = $array;
+                            }
+                            else
+                            {
+                                $total->incentive['fd_incentive'] = $fd_data;
+                            }
                         }
                         else
                         {
