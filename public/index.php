@@ -39,6 +39,9 @@ require_once '../api/admin/get_current_incentives_usertype.php';
 require_once '../api/admin/get_unpaid_incentives_usertype.php';
 require_once '../api/admin/get_incentive_details_user_id.php';
 require_once '../api/admin/pay_incentive_user_id.php';
+require_once '../api/admin/get_incentive_schemes.php';
+require_once '../api/admin/set_incentive_scheme.php';
+require_once '../api/admin/get_schemes.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';

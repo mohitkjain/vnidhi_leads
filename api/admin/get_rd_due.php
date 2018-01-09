@@ -24,7 +24,7 @@ $app->get('/api/admin/rd/due', function ($request, $response)
         $last_day_this_month  = date('Y-m-t');
         $con = connect_db();
 
-        $sql = "SELECT rd.`lead_id`, rd.`installment_no`, rd.date AS 'due_date', rd.payment_status, lead.c_name, lead.creator_id, CONCAT(creator.fname, ' ', creator.lname) AS 'creator_name', lead.assignee_id, CONCAT(assignee.fname, ' ', assignee.lname) AS 'assignee_name', leadinfo.duration, leadinfo.amount, lead.closing_date FROM `vn_rd_reward_incentive` rd INNER JOIN vn_leads lead ON rd.lead_id = lead.lead_id INNER JOIN vn_users creator ON lead.creator_id = creator.user_id INNER JOIN vn_users assignee ON lead.creator_id = assignee.user_id INNER JOIN vn_lead_info leadinfo ON rd.lead_id = leadinfo.lead_id WHERE payment_status = 'unpaid' AND date <= :last_day_this_month";
+        $sql = "SELECT rd.`lead_id`, rd.`installment_no`, rd.date AS 'due_date', rd.payment_status, lead.c_name, lead.creator_id, CONCAT(creator.fname, ' ', creator.lname) AS 'creator_name', lead.assignee_id, CONCAT(assignee.fname, ' ', assignee.lname) AS 'assignee_name', leadinfo.duration, leadinfo.amount, lead.closing_date FROM `vn_rd_reward_incentive` rd INNER JOIN vn_leads lead ON rd.lead_id = lead.lead_id INNER JOIN vn_users creator ON lead.creator_id = creator.user_id INNER JOIN vn_users assignee ON lead.assignee_id = assignee.user_id INNER JOIN vn_lead_info leadinfo ON rd.lead_id = leadinfo.lead_id WHERE payment_status = 'unpaid' AND date <= :last_day_this_month";
 
         $stmt = $con->prepare($sql);
         $stmt->bindParam(':last_day_this_month', $last_day_this_month);
