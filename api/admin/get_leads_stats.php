@@ -1,5 +1,11 @@
 <?php
 
+class Leads_Stats
+{
+    public $status;
+    public $leads;
+}
+
 $app->get('/api/admin/leads_stats', function ($request, $response) 
 {
     require_once '../api/settings/dbconnect.php';
@@ -8,11 +14,13 @@ $app->get('/api/admin/leads_stats', function ($request, $response)
         $con = connect_db();
 
         //Prepare a Query Statement
-        $sql = "SELECT COUNT(*) AS 'total_leads', (SELECT COUNT(*) FROM `vn_leads` WHERE `status` IN ('telecalling_done', 'home_meeting', 'follow_up', 'request_pending')) AS 'active_leads', (SELECT COUNT(*) FROM `vn_leads` WHERE `status` = 'accepted') AS 'accepted_leads', (SELECT COUNT(*) FROM `vn_leads` WHERE `status` = 'declined') AS 'declined_leads' FROM `vn_leads`";
+        $sql = "SELECT `status`, COUNT(*) AS 'leads' 
+        FROM `vn_leads`
+        GROUP BY `status`";
         $stmt = $con->prepare($sql);
         if ($stmt->execute()) 
         {
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            $data = $stmt->fetchALL(PDO::FETCH_CLASS, "Leads_Stats");
             
             if($data) 
             {

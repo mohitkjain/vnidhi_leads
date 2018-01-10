@@ -42,6 +42,9 @@ require_once '../api/admin/pay_incentive_user_id.php';
 require_once '../api/admin/get_incentive_schemes.php';
 require_once '../api/admin/set_incentive_scheme.php';
 require_once '../api/admin/get_schemes.php';
+require_once '../api/admin/get_schemes_details.php';
+require_once '../api/admin/get_top_salaried.php';
+require_once '../api/admin/get_top_telecaller.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';
