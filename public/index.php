@@ -48,6 +48,8 @@ require_once '../api/admin/get_top_telecaller.php';
 require_once '../api/admin/get_rewards_schemes.php';
 require_once '../api/admin/set_rewards_scheme.php';
 require_once '../api/admin/get_rewards_usertype.php';
+require_once '../api/admin/get_redemption_policy.php';
+require_once '../api/admin/set_redemption_policy.php';
 
 require_once '../api/userauth.php';
 require_once '../api/check_user_active.php';
